@@ -50,11 +50,14 @@ public class RenewalNotice {
 	public void setFilePDF(String data) {	 
 
 		try {
+			
+			
 			JSONObject jsonObject = parseJSONFile(data);
 			
-			String pathfile = jsonObject.getString("pathfile");
-			String namefile = jsonObject.getString("namefile");	
-			fontbase = jsonObject.getString("fontbase");			
+			JSONObject object = (JSONObject) jsonObject.get("path");
+			String pathfile = object.getString("pathfile");
+			String namefile = object.getString("namefile");	
+			fontbase = object.getString("fontbase");			
 			String fileout = pathfile + namefile;	
 			
 			
@@ -98,7 +101,7 @@ public class RenewalNotice {
 		    document.close();
 		    
 
-		    if(jsonObject.getString("scheduleSet").equals("YES")) {
+		    if(object.getString("scheduleSet").equals("YES")) {
 
 		    	File filePDF = new File(fileout);
 				if(filePDF.getAbsoluteFile().exists()) { 

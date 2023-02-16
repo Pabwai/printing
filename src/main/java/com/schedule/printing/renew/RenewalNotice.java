@@ -1,15 +1,12 @@
 package com.schedule.printing.renew;
 
 import java.awt.Color;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,12 +17,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bouncycastle.util.test.Test;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -48,10 +43,10 @@ public class RenewalNotice {
 	
 
 	public void setFilePDF(String data) {	 
-
+		
 		try {
 			
-			
+			    
 			JSONObject jsonObject = parseJSONFile(data);
 			
 			JSONObject object = (JSONObject) jsonObject.get("path");
@@ -66,7 +61,7 @@ public class RenewalNotice {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			Document document = new Document();		    
 			PdfCopy copy = new PdfCopy(document, bos);
-			
+			document.open();   
 			for (int i = 0; i < arr.length(); i++) {
 				
 				JSONObject jdata  = (JSONObject)arr.get(i);				
@@ -86,7 +81,7 @@ public class RenewalNotice {
 			    }
 			    
 
-			    document.open();    
+			    
 			    for (int j = 0; j < setting.length(); j++) {
 			    	JSONObject setDetail = new JSONObject();
 		    		setDetail = (JSONObject)setting.get(j);	    		
@@ -99,17 +94,21 @@ public class RenewalNotice {
 			}
 		   		  
 		    document.close();
+		    copy.close();
 		    
-
 		    if(object.getString("scheduleSet").equals("YES")) {
 
 		    	File filePDF = new File(fileout);
-				if(filePDF.getAbsoluteFile().exists()) { 
-				    mergePdfs(bos,fileout,pathfile,namefile);
-					bos.close();					
+				if(filePDF.getAbsoluteFile().exists()) {
+					File file = File.createTempFile("temp", ".pdf");
+					FileOutputStream fileOutputStream = new FileOutputStream(file);
+					bos.writeTo(fileOutputStream);
+					bos.close();
+					fileOutputStream.close();					
+				    mergePdfs(file.getAbsolutePath(),fileout,pathfile,namefile);										
 				}else {
 					FileOutputStream fileOutputStream = new FileOutputStream(fileout);
-			    	bos.writeTo(fileOutputStream);
+					bos.writeTo(fileOutputStream);
 			    	bos.close();
 			    	fileOutputStream.close();
 				}
@@ -120,7 +119,7 @@ public class RenewalNotice {
 		    	fileOutputStream.close();
 		    }
 
-		    //System.out.println("AddTextOnPDF Complete");	    
+		    System.out.println("AddTextOnPDF Complete");	    
 		
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -138,34 +137,37 @@ public class RenewalNotice {
 		
 	}
 	
-	public void mergePdfs(ByteArrayOutputStream bos ,String fileout,String pathfile,String namefile ){
+	public void mergePdfs(String tempfile ,String fileout,String pathfile,String namefile ){
         try {
-        	 //File file = File.createTempFile("temp", ".pdf",new File("D:\\workspec\\data\\temp")); // C:\Users\amit_\AppData\Local\Temp\ if not fix path
-         	 File file = File.createTempFile("temp", ".pdf");
-        	 InputStream is = new ByteArrayInputStream(bos.toByteArray());
-             Document pDFCombineUsingJava = new Document();
-
-             PdfCopy copy = new PdfCopy(pDFCombineUsingJava , new FileOutputStream(file.getAbsolutePath()));
+        	 File temp1 = new File(tempfile);
+        	 //File temp2 = new File(fileout);
+             //File mergePdfs = File.createTempFile("temp", ".pdf",new File("D:\\workspec\\data\\temp"));
+        	 File mergePdfs = File.createTempFile("temp", ".pdf");
+        	 String[] filemar = {tempfile,fileout};
+        	 Document pDFCombineUsingJava = new Document();
+             PdfCopy copy = new PdfCopy(pDFCombineUsingJava , new FileOutputStream(mergePdfs));
              pDFCombineUsingJava.open();
              PdfReader ReadInputPDF = null;
 
-             for (int i = 0; i < 2; i++) {
-            	 if(i==0)ReadInputPDF = new PdfReader(fileout);
-            	 else ReadInputPDF = new PdfReader(is);
+             for (int i = 0; i < filemar.length; i++) {
+            	 ReadInputPDF = new PdfReader(filemar[i]);
                  copy.addDocument(ReadInputPDF);
                  copy.freeReader(ReadInputPDF);
-                 ReadInputPDF.close();
+                 ReadInputPDF.close();           	 
+//            	 
              }     
-             
+             copy.close();
              pDFCombineUsingJava.close();    
              //Thread.sleep(1000);
-             
-             if (!file.exists()) throw new java.io.IOException("Not found file exists........");
-             Path copyTO = Paths.get(pathfile+namefile);
-             Path temp = Paths.get(file.getAbsolutePath()); 
-             Files.copy(temp, copyTO, StandardCopyOption.REPLACE_EXISTING);
-             file.deleteOnExit();
-
+             //temp1.deleteOnExit();
+             //temp2.deleteOnExit();
+             if (!mergePdfs.exists()) throw new java.io.IOException("Not found file exists........");
+            
+             Path to = Paths.get(fileout);
+             Path cyp = Paths.get(mergePdfs.getAbsolutePath()); 
+             Files.copy(cyp, to, StandardCopyOption.REPLACE_EXISTING);
+             mergePdfs.deleteOnExit();
+             temp1.deleteOnExit();
              //System.out.println("Complete");
            }
            catch (Exception i)
@@ -183,6 +185,8 @@ public class RenewalNotice {
     		
 	    	PdfReader reader = new PdfReader(new FileInputStream(form));
 	    	PdfStamper stamper = new PdfStamper(reader, baos);
+	    	
+	    	stamper.setFullCompression();
 	    	
 		    AcroFields fields = stamper.getAcroFields();		        	
 		    fields.setGenerateAppearances(true);

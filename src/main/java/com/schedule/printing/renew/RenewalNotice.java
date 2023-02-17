@@ -1,6 +1,7 @@
 package com.schedule.printing.renew;
 
 import java.awt.Color;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +37,7 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PushbuttonField;
 import com.itextpdf.text.pdf.qrcode.EncodeHintType;
 import com.itextpdf.text.pdf.qrcode.ErrorCorrectionLevel;
+import com.schedule.printing.util.Printing;
 
 public class RenewalNotice {	
 	
@@ -52,6 +54,7 @@ public class RenewalNotice {
 			JSONObject object = (JSONObject) jsonObject.get("path");
 			String pathfile = object.getString("pathfile");
 			String namefile = object.getString("namefile");	
+			String printername = object.getString("printername");
 			fontbase = object.getString("fontbase");			
 			String fileout = pathfile + namefile;	
 			
@@ -95,6 +98,12 @@ public class RenewalNotice {
 		   		  
 		    document.close();
 		    copy.close();
+		    
+		    if(printername != "") {
+		    	Printing printPDF = new Printing();
+			    printPDF.setPrinterService(printername,new ByteArrayInputStream(bos.toByteArray()));
+		    }
+		    
 		    
 		    if(object.getString("scheduleSet").equals("YES")) {
 

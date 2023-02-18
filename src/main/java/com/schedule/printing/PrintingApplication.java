@@ -11,7 +11,6 @@ import com.schedule.printing.renew.RenewalNotice;
 
 
 @SpringBootApplication
-@EnableAsync
 public class PrintingApplication {
 
 	public static void main(String[] args) throws IOException {

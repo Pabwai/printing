@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.text.StyleConstants.ColorConstants;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,6 +28,7 @@ import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
 import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.Barcode;
 import com.itextpdf.text.pdf.Barcode128;
@@ -37,11 +40,14 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PushbuttonField;
 import com.itextpdf.text.pdf.qrcode.EncodeHintType;
 import com.itextpdf.text.pdf.qrcode.ErrorCorrectionLevel;
+import com.schedule.printing.util.AddCertificate;
 import com.schedule.printing.util.Printing;
+import com.schedule.printing.util.WaterMark;
 
 public class RenewalNotice {	
 	
 	private String fontbase;	//full path font
+	
 	
 
 	public void setFilePDF(String data) {	 
@@ -62,7 +68,8 @@ public class RenewalNotice {
 			JSONArray arr = (JSONArray)jsonObject.get("schedule");
 
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			Document document = new Document();		    
+			Document document = new Document();	
+			document.setPageSize(PageSize.A4);
 			PdfCopy copy = new PdfCopy(document, bos);
 			document.open();   
 			for (int i = 0; i < arr.length(); i++) {
@@ -99,33 +106,41 @@ public class RenewalNotice {
 		    document.close();
 		    copy.close();
 		    
-		    if(printername != "") {
+		    if(!object.getString("printername").equals("")){
 		    	Printing printPDF = new Printing();
 			    printPDF.setPrinterService(printername,new ByteArrayInputStream(bos.toByteArray()));
 		    }
 		    
 		    
-		    if(object.getString("scheduleSet").equals("YES")) {
+		    if(object.getString("createpdf").equals("YES")) {
+		    	AddCertificate cer = new AddCertificate();
 
-		    	File filePDF = new File(fileout);
-				if(filePDF.getAbsoluteFile().exists()) {
-					File file = File.createTempFile("temp", ".pdf");
-					FileOutputStream fileOutputStream = new FileOutputStream(file);
-					bos.writeTo(fileOutputStream);
-					bos.close();
-					fileOutputStream.close();					
-				    mergePdfs(file.getAbsolutePath(),fileout,pathfile,namefile);										
-				}else {
-					FileOutputStream fileOutputStream = new FileOutputStream(fileout);
-					bos.writeTo(fileOutputStream);
+			    if(object.getString("scheduleSet").equals("YES")) {
+			    	
+			    	File filePDF = new File(fileout);
+					if(filePDF.getAbsoluteFile().exists()) {
+
+						if(object.getString("addcer").equals("YES"))cer.AddCert(bos);
+						File file = File.createTempFile("temp", ".pdf");
+						FileOutputStream fileOutputStream = new FileOutputStream(file);						
+						bos.writeTo(fileOutputStream);
+						bos.close();
+						fileOutputStream.close();					
+					    mergePdfs(file.getAbsolutePath(),fileout,pathfile,namefile);										
+					}else {
+						if(object.getString("addcer").equals("YES"))cer.AddCert(bos);
+						FileOutputStream fileOutputStream = new FileOutputStream(fileout);
+						bos.writeTo(fileOutputStream);
+				    	bos.close();
+				    	fileOutputStream.close();
+					}
+			    }else {
+			    	if(object.getString("addcer").equals("YES"))cer.AddCert(bos);
+			    	FileOutputStream fileOutputStream = new FileOutputStream(fileout);
+			    	bos.writeTo(fileOutputStream);
 			    	bos.close();
 			    	fileOutputStream.close();
-				}
-		    }else {
-		    	FileOutputStream fileOutputStream = new FileOutputStream(fileout);
-		    	bos.writeTo(fileOutputStream);
-		    	bos.close();
-		    	fileOutputStream.close();
+			    }
 		    }
 
 		    System.out.println("AddTextOnPDF Complete");	    
@@ -322,13 +337,15 @@ public class RenewalNotice {
 		Map<EncodeHintType, Object> mHints = new HashMap<>();
 	    mHints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
 	    mHints.put(EncodeHintType.CHARACTER_SET, "UTF-8");	
-		
-		BarcodeQRCode qrcode = new BarcodeQRCode(value, 33, 33, mHints);	
+		BarcodeQRCode qrcode = new BarcodeQRCode(value, 45, 45, mHints);	
 		mHints.clear();
 		
 		try {
+			qrcode.getBarcodeSize();
 			Image qrcodeImage = qrcode.getImage();
 			qrcodeImage.scalePercent(200);
+			//qrcodeImage.scaleToFit(50f, 1000f);
+			//qrcodeImage.matrix(9f);
 			PushbuttonField ad = fields.getNewPushbuttonFromField(field);
 			ad.setLayout(PushbuttonField.LAYOUT_ICON_ONLY); 
 			ad.setProportionalIcon(true);

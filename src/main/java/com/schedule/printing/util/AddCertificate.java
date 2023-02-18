@@ -26,13 +26,13 @@ public class AddCertificate {
 		// connection = (HttpURLConnection) new
 		// URL("http://16.90.10.43:8080/DigitalSign/services/DigitalSignatureWebService").openConnection();
 		connection = (HttpURLConnection) new URL(
-				"http://tmssapip04.tmith.net:8080/DigitalSign/services/DigitalSignatureWebService").openConnection();
+				"http://tmssapip03:8080/UAT-WSSigning/services/DigitalSignatureWebService").openConnection();
 		String SOAPAction = "";
 
 		String xml = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:dig=\"http://digitalsignature.ws.jds.isc.com/\">\r\n"
 				+ "   <soapenv:Header/>\r\n" + "   <soapenv:Body>\r\n" + "      <dig:signPdfRequest>\r\n"
-				+ "         <configName>pkcs11_prd1_ocs</configName>\r\n"
-				+ "         <password>STYsign25^@</password>\r\n" + "         <unsignedPdf>" + new String(Base64.getEncoder().encode(os.toByteArray()))
+				+ "         <configName>pkcs11_uat_softcard</configName>\r\n"
+				+ "         <password>P@ssw0rd</password>\r\n" + "         <unsignedPdf>" + new String(Base64.getEncoder().encode(os.toByteArray()))
 				+ "</unsignedPdf>\r\n" + "         <pdfPassword></pdfPassword>\r\n"
 				+ "      </dig:signPdfRequest>\r\n" + "   </soapenv:Body>\r\n" + "</soapenv:Envelope>";
 

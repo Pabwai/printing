@@ -22,11 +22,13 @@ public class Printing {
 	public void setPrinterService(String printerName,InputStream dataPrint) {			
 
         try {
+        	
         	PrintService myPrintService = findPrintService(printerName); //"My  Windowsprinter Name"
         	Doc pdfDoc = new SimpleDoc(dataPrint, DocFlavor.INPUT_STREAM.AUTOSENSE, null);       	
         	final HashPrintRequestAttributeSet attrs = new HashPrintRequestAttributeSet();
             attrs.add(PrintQuality.HIGH);
             attrs.add(MediaSizeName.ISO_A4);
+
         	DocPrintJob printJob = myPrintService.createPrintJob();
         	printJob.print(pdfDoc, attrs);
 		} catch (PrintException e) {

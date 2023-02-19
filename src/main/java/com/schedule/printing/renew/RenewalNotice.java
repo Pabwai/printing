@@ -18,8 +18,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.swing.text.StyleConstants.ColorConstants;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,13 +40,10 @@ import com.itextpdf.text.pdf.qrcode.EncodeHintType;
 import com.itextpdf.text.pdf.qrcode.ErrorCorrectionLevel;
 import com.schedule.printing.util.AddCertificate;
 import com.schedule.printing.util.Printing;
-import com.schedule.printing.util.WaterMark;
 
 public class RenewalNotice {	
 	
 	private String fontbase;	//full path font
-	
-	
 
 	public void setFilePDF(String data) {	 
 		
@@ -178,7 +173,7 @@ public class RenewalNotice {
                  copy.addDocument(ReadInputPDF);
                  copy.freeReader(ReadInputPDF);
                  ReadInputPDF.close();           	 
-//            	 
+            	 
              }     
              copy.close();
              pDFCombineUsingJava.close();    
@@ -327,9 +322,7 @@ public class RenewalNotice {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		 
-               
+        
     }
     
     protected void setQRCode(AcroFields fields,String field,String value ) {  

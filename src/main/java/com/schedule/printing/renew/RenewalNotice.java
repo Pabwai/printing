@@ -103,7 +103,7 @@ public class RenewalNotice {
 		    
 		    if(!object.getString("printername").equals("")){
 		    	Printing printPDF = new Printing();
-			    printPDF.setPrinterService(printername,new ByteArrayInputStream(bos.toByteArray()));
+			    printPDF.setPrinterService(printername,new ByteArrayInputStream(bos.toByteArray()),namefile);
 		    }
 		    
 		    

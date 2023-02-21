@@ -211,10 +211,9 @@ public class RenewalNotice {
 		    fields.setGenerateAppearances(true);
             stamper.setFormFlattening(true);
 		   // System.out.println(i); 
-		    
             
 		    setNameField(fields,map );		
-
+		    stamper.setFormFlattening(true);
             //stamper.setFormFlattening(false);
 		    			    
 	        stamper.close();		        
@@ -256,7 +255,7 @@ public class RenewalNotice {
 	    				setQRCode(fields,fieldName,dataValue.getValue());
 	    			}else {
 	    				fields.setFieldProperty(fieldName, "textfont", font, null);    	
-		    	    	fields.setFieldProperty(fieldName, "textsize", 10f, null);
+		    	    	fields.setFieldProperty(fieldName, "textsize", 11f, null);
 		    	    	//fields.setFieldProperty(fieldName, "fflags", PdfFormField., null);
 		    			fields.setField(fieldName,dataValue.getValue());
 	    			}   			

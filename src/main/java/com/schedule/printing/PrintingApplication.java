@@ -1,6 +1,7 @@
 package com.schedule.printing;
 
 
+import java.io.File;
 import java.io.IOException;
 
 import org.springframework.boot.SpringApplication;
@@ -23,8 +24,8 @@ public class PrintingApplication {
 		 RenewalNotice re = new RenewalNotice();
          re.setFilePDF(args[0]);
          
-         //File file = new File(args[0]);  
-         //if (file.exists()) file.delete();
+         File file = new File(args[0]);  
+         if (file.exists()) file.delete();
 	}
 
 }

@@ -108,7 +108,7 @@ public class RenewalNotice {
 		    
 		    if(!object.getString("printername").equals("")){
 		    	Printing printPDF = new Printing();
-			    printPDF.setPrinterService(printername,new ByteArrayInputStream(bos.toByteArray()));
+			    printPDF.setPrinterService(printername,new ByteArrayInputStream(bos.toByteArray()),namefile);
 		    }
 		    
 		    
@@ -210,6 +210,7 @@ public class RenewalNotice {
 			JSONObject setDetail = new JSONObject();
     		setDetail = (JSONObject)scheduleMap.get(i);
     		
+<<<<<<< HEAD
     		String templete = setDetail.get("formPage").toString();
     		
     		File ftmp = new File(templete);
@@ -218,6 +219,30 @@ public class RenewalNotice {
 	    		   
     			
 		    	PdfReader reader = new PdfReader(new FileInputStream(ftmp));
+=======
+	    	PdfReader reader = new PdfReader(new FileInputStream(form));
+	    	PdfStamper stamper = new PdfStamper(reader, baos);
+	    	
+	    	stamper.setFullCompression();
+	    	
+		    AcroFields fields = stamper.getAcroFields();		        	
+		    fields.setGenerateAppearances(true);
+            stamper.setFormFlattening(true);
+		   // System.out.println(i); 
+            
+		    setNameField(fields,map );		
+		    stamper.setFormFlattening(true);
+            //stamper.setFormFlattening(false);
+		    			    
+	        stamper.close();		        
+	        reader = new PdfReader(baos.toByteArray());
+	        copy.addPage(copy.getImportedPage(reader,1)); // Choose page 
+	        reader.close();
+	        
+	    }
+    	baos.close();
+    	
+>>>>>>> cfbc39dcea3655c00618a9a4888882e851db602c
 
 		    	PdfStamper stamper = new PdfStamper(reader, baos);
 		    	
@@ -261,6 +286,7 @@ public class RenewalNotice {
 			//System.out.println(fields.getFieldItem(fieldName).getWidget(0) +" :");  
     		
 			for (Entry<String, String> dataValue : data.entrySet()) {	    		
+<<<<<<< HEAD
 				if (dataValue.getKey().equals(fieldName)) {
 					String[] sentences = fieldName.split("\\_");
 					
@@ -324,6 +350,26 @@ public class RenewalNotice {
 							
 			}
 			
+=======
+	    		if (dataValue.getKey().equals(fieldName)) {
+	    			
+	    			if(fieldName.equals("img_head")) {
+	    				setImgField(fields,fieldName,dataValue.getValue());
+	    				
+	    			}else if(fieldName.equals("barcode")) {
+	    				setBarcode(fields,fieldName,dataValue.getValue());
+	    			}else if(fieldName.equals("qrcode")) {
+	    				setQRCode(fields,fieldName,dataValue.getValue());
+	    			}else {
+	    				fields.setFieldProperty(fieldName, "textfont", font, null);    	
+		    	    	fields.setFieldProperty(fieldName, "textsize", 11f, null);
+		    	    	//fields.setFieldProperty(fieldName, "fflags", PdfFormField., null);
+		    			fields.setField(fieldName,dataValue.getValue());
+	    			}   			
+	    		
+	    		} 	
+	    	}				
+>>>>>>> cfbc39dcea3655c00618a9a4888882e851db602c
 			
 	    		
 		}

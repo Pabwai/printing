@@ -210,49 +210,24 @@ public class RenewalNotice {
 			JSONObject setDetail = new JSONObject();
     		setDetail = (JSONObject)scheduleMap.get(i);
     		
-<<<<<<< HEAD
     		String templete = setDetail.get("formPage").toString();
-    		
     		File ftmp = new File(templete);
-    		
     		if(ftmp.exists() && !ftmp.isDirectory()) { 
 	    		   
-    			
-		    	PdfReader reader = new PdfReader(new FileInputStream(ftmp));
-=======
-	    	PdfReader reader = new PdfReader(new FileInputStream(form));
-	    	PdfStamper stamper = new PdfStamper(reader, baos);
-	    	
-	    	stamper.setFullCompression();
-	    	
-		    AcroFields fields = stamper.getAcroFields();		        	
-		    fields.setGenerateAppearances(true);
-            stamper.setFormFlattening(true);
-		   // System.out.println(i); 
-            
-		    setNameField(fields,map );		
-		    stamper.setFormFlattening(true);
-            //stamper.setFormFlattening(false);
-		    			    
-	        stamper.close();		        
-	        reader = new PdfReader(baos.toByteArray());
-	        copy.addPage(copy.getImportedPage(reader,1)); // Choose page 
-	        reader.close();
-	        
-	    }
-    	baos.close();
-    	
->>>>>>> cfbc39dcea3655c00618a9a4888882e851db602c
-
+	    		
+		    	PdfReader reader = new PdfReader(new FileInputStream(templete));
+		
 		    	PdfStamper stamper = new PdfStamper(reader, baos);
 		    	
 			    AcroFields fields = stamper.getAcroFields();		        	
 				fields.setGenerateAppearances(true);
 		        stamper.setFormFlattening(true);
-		        
-				setNameField(fields, stamper, detailMap);					
-				
-				
+		            
+				setNameField(fields, stamper, detailMap);	
+				Object[] keys = fields.getFields().keySet().toArray();
+				for(int f = 0;f < keys.length;f++) {
+					fields.removeField((String)keys[f]);
+				}
 			    stamper.close();		  
 		    	
 		    	int copyPage =  Integer.parseInt(setDetail.get("pageCopy").toString());
@@ -266,8 +241,8 @@ public class RenewalNotice {
 		        }     
 	        }	   
 		}
-    	baos.close();   
-     }
+    	baos.close(); 
+	}
 	
 	protected void setNameField(AcroFields fields, PdfStamper stamper, Map<String, String> data) throws IOException, DocumentException {
         // Set font size.
@@ -286,7 +261,7 @@ public class RenewalNotice {
 			//System.out.println(fields.getFieldItem(fieldName).getWidget(0) +" :");  
     		
 			for (Entry<String, String> dataValue : data.entrySet()) {	    		
-<<<<<<< HEAD
+
 				if (dataValue.getKey().equals(fieldName)) {
 					String[] sentences = fieldName.split("\\_");
 					
@@ -309,18 +284,9 @@ public class RenewalNotice {
 //						fields.setFieldProperty(fieldName, "textfont", font, null);    	
 //		    	    	//fields.setFieldProperty(fieldName, "textsize", 12f, null);
 //		    	    	fields.setFieldProperty(fieldName, "fflags", PdfFormField.FLAGS_INVISIBLE, null);	
-//		    	    	
-//		    	    	
-//		    	    	
-//		    	    	
-		    			fields.getFieldItem(fieldName);
-		    			
-						
-						
 
 						
 						PdfDictionary widgetDict = fields.getFieldItem(fieldName).getWidget(0);
-						
 						TextField textField = new TextField(null, null, null);
 						fields.decodeGenericDictionary(widgetDict, textField);
 						float fontsize = textField.getFontSize();  // Font Size
@@ -332,6 +298,7 @@ public class RenewalNotice {
 						over.beginText();
 						over.setFontAndSize(font,fontsize);// set font and size
 						over.setColorFill(BaseColor.BLACK);// set color text
+						
 						String test = "";
 						if(data.get(fieldName).equals(""))test = fieldName;
 						else test =  data.get(fieldName);
@@ -349,28 +316,6 @@ public class RenewalNotice {
 				} 	
 							
 			}
-			
-=======
-	    		if (dataValue.getKey().equals(fieldName)) {
-	    			
-	    			if(fieldName.equals("img_head")) {
-	    				setImgField(fields,fieldName,dataValue.getValue());
-	    				
-	    			}else if(fieldName.equals("barcode")) {
-	    				setBarcode(fields,fieldName,dataValue.getValue());
-	    			}else if(fieldName.equals("qrcode")) {
-	    				setQRCode(fields,fieldName,dataValue.getValue());
-	    			}else {
-	    				fields.setFieldProperty(fieldName, "textfont", font, null);    	
-		    	    	fields.setFieldProperty(fieldName, "textsize", 11f, null);
-		    	    	//fields.setFieldProperty(fieldName, "fflags", PdfFormField., null);
-		    			fields.setField(fieldName,dataValue.getValue());
-	    			}   			
-	    		
-	    		} 	
-	    	}				
->>>>>>> cfbc39dcea3655c00618a9a4888882e851db602c
-			
 	    		
 		}
 		

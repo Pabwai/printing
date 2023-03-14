@@ -1,5 +1,6 @@
 package com.schedule.printing.renew;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -56,7 +57,7 @@ import com.schedule.printing.util.Printing;
 public class RenewalNotice {	
 	
 	private String fontbase;	//full path font
-
+	private String logoTMSTH;	//full path font
 	public void setFilePDF(String data) {	 
 		
 		try {
@@ -69,6 +70,7 @@ public class RenewalNotice {
 			String namefile = object.getString("namefile");	
 			String printername = object.getString("printername");
 			fontbase = object.getString("fontbase");			
+			
 			String fileout = pathfile + namefile;	
 			
 			
@@ -93,7 +95,7 @@ public class RenewalNotice {
 			    while(keysItr.hasNext() ) {
 			        String key = keysItr.next();
 			        String value = deatil.getString(key);
-			        
+			        logoTMSTH = deatil.getString("img_logoqrcode");
 			        map.put(key, value);
 			    }
 			    
@@ -202,7 +204,7 @@ public class RenewalNotice {
 	
 	
 	
-	protected void  setForm(PdfCopy copy, JSONArray scheduleMap, Map<String, String> detailMap) throws FileNotFoundException, IOException, DocumentException {
+	protected void  setForm(PdfCopy copy, JSONArray scheduleMap, Map<String, String> detailMap) throws FileNotFoundException, IOException, DocumentException, WriterException {
     	
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();	
 		
@@ -244,7 +246,7 @@ public class RenewalNotice {
     	baos.close(); 
 	}
 	
-	protected void setNameField(AcroFields fields, PdfStamper stamper, Map<String, String> data) throws IOException, DocumentException {
+	protected void setNameField(AcroFields fields, PdfStamper stamper, Map<String, String> data) throws IOException, DocumentException, WriterException {
         // Set font size.
 		
 	    BaseFont font = BaseFont.createFont(fontbase, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
@@ -261,7 +263,7 @@ public class RenewalNotice {
 			//System.out.println(fields.getFieldItem(fieldName).getWidget(0) +" :");  
     		
 			for (Entry<String, String> dataValue : data.entrySet()) {	    		
-
+				
 				if (dataValue.getKey().equals(fieldName)) {
 					String[] sentences = fieldName.split("\\_");
 					
@@ -355,7 +357,7 @@ public class RenewalNotice {
 	
     
 	protected void setBarcode(AcroFields fields,PdfStamper stamper, String field,String value ) {  
-
+		value = value.replace(" ", "\n");
         Barcode128  barcode = new Barcode128();
         //barcode.setBaseline(-1); //text to top
         //final BaseFont font = BaseFont.createFont(fontbase1, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
@@ -392,8 +394,74 @@ public class RenewalNotice {
                
     }
     
+//	protected void setQRCode(AcroFields fields, PdfStamper stamper, String field,String value ) {  
+//	    
+//    	Map<EncodeHintType, Object> hashMap = new EnumMap<EncodeHintType, Object>(EncodeHintType.class); 
+//    	hashMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+//    	hashMap.put(EncodeHintType.CHARACTER_SET, "UTF-8");	
+//    	hashMap.put(EncodeHintType.MARGIN, 0); /* default = 4 */
+//
+//		try {				
+//
+//			QRCodeWriter barcodeWriter = new QRCodeWriter();
+//    	    BitMatrix bitMatrix =  barcodeWriter.encode(value, BarcodeFormat.QR_CODE, 200, 200,hashMap);
+//    	   
+//			int matrixWidth = bitMatrix.getWidth();			
+//			BufferedImage qrImg  = new BufferedImage(matrixWidth, matrixWidth, BufferedImage.TYPE_INT_RGB);
+//			qrImg.createGraphics();
+//
+//			Graphics2D graphics = (Graphics2D) qrImg.getGraphics();
+//			//graphics.setComposite(AlphaComposite.Clear);
+//			graphics.setColor(Color.WHITE);
+//			graphics.fillRect(0, 0, matrixWidth, matrixWidth);
+//			// Paint and save the image using the ByteMatrix
+//			graphics.setColor(Color.BLACK);
+//
+//			for (int i = 0; i < matrixWidth; i++) {
+//				for (int j = 0; j < matrixWidth; j++) {
+//					if (bitMatrix.get(i, j)) {
+//						graphics.fillRect(i, j, 1, 1);
+//					}
+//				}
+//			}
+//			
+//			//graphics.setComposite(AlphaComposite.SrcOver);
+//			graphics.drawImage(qrImg, 0, 0, matrixWidth, matrixWidth, null);
+//			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//			ImageIO.write(qrImg, "gif", bos);
+//			
+//			Rectangle rect = fields.getFieldPositions(field).get(0).position;
+//    	    float left   = rect.getLeft();
+//    	    float width  = rect.getWidth();
+//    	    float height = rect.getHeight();
+//    		
+//    	   
+//    	    
+//    		Image img = Image.getInstance(bos.toByteArray());  		
+//    		img.scaleAbsolute(width,height);
+//    		img.setAbsolutePosition(left, rect.getBottom());
+//    		PdfContentByte canvas = stamper.getOverContent(1);
+//    		canvas.addImage(img);    
+//    		bos.close();
+//			hashMap.clear();
+//
+//		} catch (BadElementException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (DocumentException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (WriterException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}	   
+//               
+//    }
 	protected void setQRCode(AcroFields fields, PdfStamper stamper, String field,String value ) {  
-	    
+		value = value.replace(" ", "\n");
     	Map<EncodeHintType, Object> hashMap = new EnumMap<EncodeHintType, Object>(EncodeHintType.class); 
     	hashMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
     	hashMap.put(EncodeHintType.CHARACTER_SET, "UTF-8");	
@@ -402,7 +470,7 @@ public class RenewalNotice {
 		try {				
 
 			QRCodeWriter barcodeWriter = new QRCodeWriter();
-    	    BitMatrix bitMatrix =  barcodeWriter.encode(value, BarcodeFormat.QR_CODE, 200, 200,hashMap);
+    	    BitMatrix bitMatrix =  barcodeWriter.encode(value, BarcodeFormat.QR_CODE, 400, 400,hashMap);
     	   
 			int matrixWidth = bitMatrix.getWidth();			
 			BufferedImage qrImg  = new BufferedImage(matrixWidth, matrixWidth, BufferedImage.TYPE_INT_RGB);
@@ -422,21 +490,31 @@ public class RenewalNotice {
 					}
 				}
 			}
-			
 			//graphics.setComposite(AlphaComposite.SrcOver);
 			graphics.drawImage(qrImg, 0, 0, matrixWidth, matrixWidth, null);
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			ImageIO.write(qrImg, "gif", bos);
+			
+		
+			
+			BufferedImage logoImage = ImageIO.read( new File(logoTMSTH));
+	        int finalImageHeight = qrImg.getHeight() - logoImage.getHeight();
+	        int finalImageWidth = qrImg.getWidth() - logoImage.getWidth();
+            graphics.drawImage(qrImg, 0, 0, null);
+            graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            graphics.drawImage(logoImage, (int) Math.round(finalImageWidth / 2), (int) Math.round(finalImageHeight / 2), null);
+
+	        ImageIO.write(qrImg, "png", bos);
+			
 			
 			Rectangle rect = fields.getFieldPositions(field).get(0).position;
     	    float left   = rect.getLeft();
     	    float width  = rect.getWidth();
     	    float height = rect.getHeight();
     		
-    	   
-    	    
     		Image img = Image.getInstance(bos.toByteArray());  		
     		img.scaleAbsolute(width,height);
+    			
+    		
     		img.setAbsolutePosition(left, rect.getBottom());
     		PdfContentByte canvas = stamper.getOverContent(1);
     		canvas.addImage(img);    
@@ -458,7 +536,8 @@ public class RenewalNotice {
 		}	   
                
     }
-    
+	
+	
     public static JSONObject parseJSONFile(String filename) throws JSONException, IOException {
         String content = new String(Files.readAllBytes(Paths.get(filename)),StandardCharsets.UTF_8);
         return new JSONObject(content);

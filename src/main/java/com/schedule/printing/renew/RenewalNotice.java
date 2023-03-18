@@ -267,11 +267,16 @@ public class RenewalNotice {
 				if (dataValue.getKey().equals(fieldName)) {
 					String[] sentences = fieldName.split("\\_");
 					
-					if(sentences[0].equals("img")) {
-						//System.out.println(sentences[0]);
-						if(sentences[1].equals("head"))setImgField(fields, stamper, fieldName,data.get(fieldName));
-						else if(sentences[1].equals("barcode"))setBarcode(fields,stamper ,fieldName,data.get(fieldName)); //"barcode"
-						else if(sentences[1].equals("qrcode"))setQRCode(fields, stamper, fieldName,data.get(fieldName)); // qrcode
+					if(sentences[0].equals("gen")) {
+						String name = "";
+						if(sentences[1].length()>=7) name = sentences[1].substring(0,7);
+						else if(sentences[1].length()<=6) name = sentences[1].substring(0,6);
+						
+						if(name.equals("barcode"))setBarcode(fields,stamper ,fieldName,data.get(fieldName)); //"barcode"
+						else if(name.equals("qrcode"))setQRCode(fields, stamper, fieldName,data.get(fieldName)); // qrcode
+					}
+					else if(sentences[0].equals("img")) {
+						setImgField(fields, stamper, fieldName,data.get(fieldName));
 					}else if (sentences[0].equals("txt")) {
 						
 //
